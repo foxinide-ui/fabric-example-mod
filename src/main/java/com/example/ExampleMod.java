@@ -1,24 +1,43 @@
 package com.example;
 
 import net.fabricmc.api.ModInitializer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
 public class ExampleMod implements ModInitializer {
-	public static final String MOD_ID = "modid";
+    public static final String MOD_ID = "modid";
+    
+    private static KeyBinding toggleKeyBinding;
+    private static boolean isEnabled = true;
 
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    @Override
+    public void onInitialize() {
+        toggleKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.autosprint.toggle",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_V, 
+                "category.autosprint"
+        ));
 
-	@Override
-	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.player == null) return;
 
-		LOGGER.info("Hello Fabric world!");
-	}
+            while (toggleKeyBinding.wasPressed()) {
+                isEnabled = !isEnabled;
+                if (isEnabled) {
+                    client.player.sendMessage(Text.literal("§aAutoSprint: Включен"), true);
+                } else {
+                    client.player.sendMessage(Text.literal("§cAutoSprint: Выключен"), true);
+                }
+            }
+
+            if (isEnabled && client.options.forwardKey.isPressed()) {
+                client.options.sprintKey.setPressed(true);
+            }
+        });
+    }
 }
