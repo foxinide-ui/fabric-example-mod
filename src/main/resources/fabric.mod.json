@@ -17,9 +17,6 @@
 	"entrypoints": {
 		"main": [
 			"com.example.ExampleMod"
-		],
-		"client": [
-			"com.example.client.ExampleModClient"
 		]
 	},
 	"mixins": [
@@ -30,9 +27,9 @@
 		}
 	],
 	"depends": {
-		"fabricloader": ">=0.19.3",
-		"minecraft": "~26.1.2",
-		"java": ">=25",
+		"fabricloader": ">=0.15.0",
+		"minecraft": "1.21.11",
+		"java": ">=21",
 		"fabric-api": "*"
 	}
 }
